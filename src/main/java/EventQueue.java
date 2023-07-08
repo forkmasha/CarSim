@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventQueue {
+public  class EventQueue {
     private List<Event> events;
     private int maxCars;
 

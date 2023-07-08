@@ -1,6 +1,6 @@
 import java.util.List;
 
-class GasStationStatistics {
+public class GasStationStatistics {
     private List<Double> waitingTimes;
     private List<Double> systemTimes;
     private List<Double> queueTimes;
@@ -40,7 +40,7 @@ class GasStationStatistics {
     }
 
     public double getMeanQtime() {
-        return calculateMean(queueTimes);
+        return calculateMean(waitingTimes);  // Calculate mean waiting time instead of queue time
     }
 
     public double getStdDevStime() {
@@ -48,7 +48,7 @@ class GasStationStatistics {
     }
 
     public double getStdDevQtime() {
-        return calculateStd(queueTimes);
+        return calculateStd(waitingTimes);  // Calculate standard deviation of waiting time instead of queue time
     }
 
     public double getConfidenceIntervalStime() {

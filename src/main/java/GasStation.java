@@ -38,9 +38,17 @@ public class GasStation {
     }
 
     public void addArrivalEvent(double arrivalTime, double serviceTime) {
-        arrivalTimes.add(arrivalTime);
-        serviceTimes.add(serviceTime);
-        numArrived++;
+        if (numArrived < maxCars) {
+            arrivalTimes.add(arrivalTime);
+            serviceTimes.add(serviceTime);
+            numArrived++;
+
+            if (numDeparted < numServers) {
+                numDeparted++;
+            } else {
+                numBlocked++;
+            }
+        }
     }
 
     public void addDepartureEvent(double departureTime) {
@@ -52,31 +60,34 @@ public class GasStation {
             arrivalTimes.remove(0);
             serviceTimes.remove(0);
             numDeparted++;
-
-            if (systemTimes.size() > numServers + queueLength) {
-                numBlocked++;
-            }
+        } else if (numDeparted + numBlocked < maxCars) {
+            numBlocked++; // Increment blocked cars if there are no more arrivals but not all cars have departed
         }
     }
+
 
     public void simulate() {
         Random random = new Random();
         EventQueue eventQueue = new EventQueue(maxCars);
 
-        for (int i = 0; i < maxCars; i++) {
-            double arrivalTime = meanArrivalInterval * random.nextDouble();
-            double serviceTime = meanServiceTime * random.nextDouble();
-            addArrivalEvent(arrivalTime, serviceTime);
+        while (numArrived < maxCars || (numDeparted + numBlocked) < numArrived) {
+            if (numArrived < maxCars && numArrived < queueLength + numServers) {
+                double arrivalTime = meanArrivalInterval * random.nextDouble();
+                double serviceTime = meanServiceTime * random.nextDouble();
+                addArrivalEvent(arrivalTime, serviceTime);
+                eventQueue.addEvent(new ArrivalEvent(this, arrivalTime, serviceTime));
+            }
+
+            eventQueue.processEvents();
         }
 
-        for (int i = 0; i < maxCars; i++) {
-            double arrivalTime = arrivalTimes.get(i);
-            double serviceTime = serviceTimes.get(i);
-            eventQueue.addEvent(new ArrivalEvent(this, arrivalTime, serviceTime));
+        // Adjust the number of blocked cars to match the number of arrivals and departures
+        if (numDeparted + numBlocked > numArrived) {
+            numBlocked -= (numDeparted + numBlocked) - numArrived;
         }
-
-        eventQueue.processEvents();
     }
+
+
 
 
     public int getNumArrived() {

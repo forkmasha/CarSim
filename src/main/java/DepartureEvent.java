@@ -1,4 +1,4 @@
-public class DepartureEvent implements Event {
+public  class DepartureEvent implements Event {
     private GasStation gasStation;
     private double departureTime;
 
